@@ -27,10 +27,18 @@
          A))
      A)))
 
-(defn insert! [f A v]
- (let [c (count A)]
-   (sift-up! f (conj! A v) (inc c))))
+(defn insert!
+  ([A v]
+   (insert! identity A v))
 
-(defn pop! [f A]
- (let [c (count A)]
-   (sift-down! f (clojure.core/pop! (swap! A 0 (dec c))) 1)))
+  ([f A v]
+   (let [c (count A)]
+     (sift-up! f (conj! A v) (inc c)))))
+
+(defn pop!
+  ([A]
+   (pop! identity A))
+
+  ([f A]
+   (let [c (count A)]
+     (sift-down! f (clojure.core/pop! (swap! A 0 (dec c))) 1))))
