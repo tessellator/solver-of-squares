@@ -28,7 +28,7 @@ algorithms were used (and sometimes discarded) in developing this application
 
 ## License
 
-Copyright © 2014 Chad Taylor
+Copyright © 2014-2015 Chad Taylor
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

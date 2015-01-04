@@ -3,7 +3,7 @@
 ## A* Search
 To solve a level, the application uses the [A* search algorithm]
 (http://en.wikipedia.org/wiki/A*_search_algorithm), and the implementation is
-in the `solver-of-squares.algorithms` namespace.  The implementation is general
+in the `solver-of-squares.search` namespace.  The implementation is general
 and could easily be used for other problems.
 
 The heuristic currently used is simple [Manhattan distance]
@@ -18,8 +18,8 @@ If you think you have a better heuristic, please open an issue and let's explore
 it together!
 
 ## Transient Priority Queue
-Each step in A* expands the next-smallest unexpanded node.  I tried a few 
-different approaches before settling on a transient priority queue 
+Each step in A* expands the next-smallest unexpanded node.  I tried a few
+different approaches before settling on a transient priority queue
 implementation.  Each approach is discussed in turn.
 
 My original implementation was to use the first state in the list (the one
@@ -55,12 +55,12 @@ Given the heap
    B     C
   / \   /
  D  E  F
-```            
+```
 
 a normal representation would be `[A B C D E F]`, but an inverse representation
-would be `[F E D C B A]`.  This seemed to work well at first.  I could create 
-the heap in _O(n)_ time, and pulling the smallest element would be in _O(1)_ 
-time.  After the new elements were created, I would conj one of them onto the 
+would be `[F E D C B A]`.  This seemed to work well at first.  I could create
+the heap in _O(n)_ time, and pulling the smallest element would be in _O(1)_
+time.  After the new elements were created, I would conj one of them onto the
 vector and sift down (an _O(lgn)_ operation).  However, this approach led to
 incorrect results because when a conj occurred that changed the number of
 elements in the tree since the last heapify operation had been run, it changed
@@ -68,12 +68,12 @@ the interpretation of the heap.  (It was essentially adding a new node at the
 top of the heap and then restructuring the heap with different parent-child
 pairings.
 
-For example, given the inverse heap `[F E D C B G]` (after element A has been 
+For example, given the inverse heap `[F E D C B G]` (after element A has been
 popped off the heap), sifting down will create a correct new inverse heap
 `[F E G C D B]`.  Repeating the process for element H, however, presents a
 problem.
 
-Before conj'ing element H: 
+Before conj'ing element H:
 ```
         B
       /   \
@@ -81,8 +81,8 @@ Before conj'ing element H:
     / \   /
    G  E  F
 ```
-                              
-                              
+
+
 After conj'ing element H:
 ```
         H
@@ -91,22 +91,22 @@ After conj'ing element H:
     / \   / \
    C   G E   F
 ```
-                            
-These are obviously two very different heaps (and the second *could* have had 
+
+These are obviously two very different heaps (and the second *could* have had
 errors).
 
 The solution was to heapify after the new states were added.  This led to
-correct results and ran in _O(n)_ time, an improvement over _O(nlgn)_ from 
+correct results and ran in _O(n)_ time, an improvement over _O(nlgn)_ from
 before.  However, this approach was still performing more operations than
 necessary because it did not take advantage of the partial heap between states.
-(In fact, running min on the list at each step would have likely been a bit 
+(In fact, running min on the list at each step would have likely been a bit
 faster.)
 
 The final solution falls back to a vanilla min-heap approach, with the smallest
 element as the first in the vector.  To pop it off the vector, switch it with
-the last value (_O(1)_), pop it off the vector (_O(1)_), and sift the large 
+the last value (_O(1)_), pop it off the vector (_O(1)_), and sift the large
 value down the tree (_O(lgn)_).  Inserting a new element is as simple as pushing
-it onto the end of the vector (_O(1)_) and then sifting it up the heap 
+it onto the end of the vector (_O(1)_) and then sifting it up the heap
 (_O(lgn)_).  The result is a series of operations that occur in _O(lgn)_ time,
 which scales well as the problem space grows.
 
